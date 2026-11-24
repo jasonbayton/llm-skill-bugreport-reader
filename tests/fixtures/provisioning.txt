@@ -1,0 +1,14 @@
+====== BEGIN DUMPSTATE ======
+[ro.build.version.release]: [14]
+[ro.build.version.sdk]: [34]
+[ro.build.version.security_patch]: [2026-01-05]
+[ro.product.manufacturer]: [generic]
+[ro.product.model]: [Virtual Test Device]
+[ro.build.id]: [TESTBUILD]
+-------- DUMP OF SERVICE device_policy --------
+Device Owner: null
+mLockTaskModeState=NONE
+01-01 12:00:00.100  2000  2000 I ActivityTaskManager: START u0 {act=android.app.action.PROVISION_MANAGED_DEVICE}
+01-01 12:00:01.200  2001  2001 W ManagedProvisioning: status=STATUS_DEVICE_ADMIN_NOT_SUPPORTED
+01-01 12:00:01.400  2001  2001 I ManagedProvisioning: Finishing provisioning with failure
+01-01 12:00:01.500  2000  2000 I Example: username=example@example.com access_token=not-real-secret

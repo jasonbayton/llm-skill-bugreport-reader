@@ -1,0 +1,6 @@
+[
+  {"id":"provisioning-feature","fixture":"fixtures/provisioning.txt","prompt":"Our device-owner enrollment failed around 10:00 UTC on 10 January. What blocked it, and what should we do next?"},
+  {"id":"suspended-browser","fixture":"fixtures/browser.txt","prompt":"The work web app would not open its page around 12:00 UTC on 11 February. It works for the personal user. Explain the failure and the next verification step."},
+  {"id":"pending-install","fixture":"fixtures/pending.txt","prompt":"The EMM says the inventory update was accepted at 13:00 UTC on 12 March, but the old version is still visible. Did the install succeed, and what should we capture next?"},
+  {"id":"call-ui","fixture":"fixtures/call-ui.txt","prompt":"The call screen failed to appear when our kiosk app initiated a call at 14:00 UTC on 13 April. Does this show call setup failed, and what should we change or verify?"}
+]

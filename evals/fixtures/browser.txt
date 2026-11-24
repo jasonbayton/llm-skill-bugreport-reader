@@ -1,0 +1,16 @@
+== dumpstate: 2026-02-11 12:10:00+0000
+[persist.sys.timezone]: [UTC]
+------ SYSTEM LOG ------
+02-11 12:00:00.000 1000 100 110 I DevicePolicyManager: setPackagesSuspended user=10 package=com.example.browser suspended=true policy=work-8
+02-11 12:00:01.000 1012345 200 210 I WebApp: operation=w4 user=10 opening https://example.invalid/dashboard in com.example.browser/.Main
+02-11 12:00:01.010 1000 100 110 I ActivityTaskManager: operation=w4 START u10 cmp=com.example.browser/.Main
+02-11 12:00:01.015 1000 100 110 W ActivityTaskManager: operation=w4 START_CANCELED target package suspended user=10
+02-11 12:05:00.000 1000 100 110 I DevicePolicyManager: setPackagesSuspended user=10 package=com.example.browser suspended=false policy=work-9
+------ DUMP OF SERVICE package ------
+  Package [com.example.other] (a1):
+    User 10: installed=false suspended=true enabled=2
+  Package [com.example.browser] (b1):
+    versionCode=14
+    installerPackageName=com.example.store
+    User 0: installed=true suspended=false enabled=0
+    User 10: installed=true suspended=false enabled=0

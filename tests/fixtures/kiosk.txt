@@ -1,0 +1,8 @@
+[ro.build.version.release]: [15]
+[ro.build.version.sdk]: [35]
+-------- DUMP OF SERVICE device_policy --------
+Device Owner: ComponentInfo{com.example.controller/.AdminReceiver}
+mLockTaskModeState=NONE
+01-01 12:05:01.123  2334  2400 I DevicePolicyManager: setPackagesSuspended user=0 package=com.example.browser suspended=true
+01-01 12:05:03.123  2334  2400 I ActivityTaskManager: START u0 {act=android.intent.action.VIEW cmp=com.example.browser/.MainActivity}
+01-01 12:05:03.220  2334  2400 W ActivityTaskManager: START_CANCELED target package suspended

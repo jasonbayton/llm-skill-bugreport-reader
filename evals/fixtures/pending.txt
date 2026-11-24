@@ -1,0 +1,12 @@
+== dumpstate: 2026-03-12 13:05:00+0000
+[persist.sys.timezone]: [UTC]
+------ SYSTEM LOG ------
+03-12 13:00:00.000 10123 200 210 I CloudDPC: policy=p10 user=0 requested app=com.example.inventory version=7
+03-12 13:00:01.000 10123 200 210 I AMAPI: InstallApplicationCommand command=c42 package=com.example.inventory user=0 state=PENDING
+03-12 13:00:01.010 10123 200 210 I CustomAppInstallationWorker: command=c42 accepted; awaiting callback
+03-12 13:02:00.000 10124 300 310 E OtherApp: UnknownHostException unrelated.example.invalid
+------ DUMP OF SERVICE package ------
+  Package [com.example.inventory] (c1):
+    versionCode=6
+    installerPackageName=com.example.store
+    User 0: installed=true hidden=false suspended=false enabled=0

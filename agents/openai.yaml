@@ -1,0 +1,4 @@
+interface:
+  display_name: "Android Bugreport Diagnosis"
+  short_description: "Trace Android failures to evidence-backed causes"
+  default_prompt: "Use $android-enterprise-bugreport to investigate this report, establish the first failed transition, and explain the cause or smallest decisive next test."

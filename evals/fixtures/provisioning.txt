@@ -1,0 +1,11 @@
+== dumpstate: 2026-01-10 10:05:00+0000
+[persist.sys.timezone]: [UTC]
+[ro.build.version.release]: [16]
+------ SYSTEM LOG ------
+01-10 10:00:01.000 1000 300 310 I ManagedProvisioning: request=p7 user=0 PROVISION_MANAGED_DEVICE component=com.example.dpc/.Admin
+01-10 10:00:01.010 1000 300 310 I DevicePolicyManager: request=p7 hasSystemFeature(android.software.device_admin)=false
+01-10 10:00:01.015 1000 300 310 E ManagedProvisioning: request=p7 STATUS_DEVICE_ADMIN_NOT_SUPPORTED provisioning aborted
+01-10 10:02:02.000 1000 320 321 E Finsky: unrelated request=q9 download retry: timeout
+------ DUMP OF SERVICE device_policy ------
+mHasFeature=false
+Device Owner: none
