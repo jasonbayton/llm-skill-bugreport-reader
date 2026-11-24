@@ -1,5 +1,7 @@
 # Android Enterprise bug-report analysis skill
 
+> **Under active testing — not production-ready.** This skill is still being tested and refined. Diagnostic accuracy and reliability have not yet been established for production use. Review findings against the original evidence; passing automated tests does not guarantee a correct diagnosis.
+
 A reusable, evidence-first **end-to-end diagnostic** skill for Android bugreport ZIP/TXT archives. It reconstructs enterprise management and device state, follows an incident across processes and framework services, tests competing causal hypotheses and determines the earliest supported root cause. When the evidence is incomplete, it reports the first demonstrated failing boundary and the smallest decisive next test. It does not invent causes from noisy log messages.
 
 ## Structure
