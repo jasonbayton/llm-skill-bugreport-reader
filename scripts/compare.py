@@ -11,6 +11,8 @@ import argparse
 from pathlib import Path
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from triage import analyse, FOCUSES
 from report_io import add_scan_arguments, limits_from_args
 

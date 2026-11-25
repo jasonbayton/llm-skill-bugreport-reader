@@ -3,7 +3,11 @@
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from report_io import iter_lines, new_coverage, redact, add_scan_arguments, limits_from_args
 from evidence_context import ContextTracker
 

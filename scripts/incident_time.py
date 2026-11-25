@@ -1,7 +1,12 @@
 """UTC window alignment using per-member clock evidence, never host timezone."""
 import re
+import sys
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from report_io import iter_lines, new_coverage
 
 STAMP = re.compile(r'(?<![\d-])(?:(\d{4})-)?(\d{2})-(\d{2})[T ]+(\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?)(Z|[+-]\d{2}:?\d{2}|\s+(?:UTC|GMT|[ECMP][DS]T|BST|CEST|CET)\b)?')

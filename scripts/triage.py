@@ -18,6 +18,9 @@ from pathlib import Path
 import re
 import sys
 
+# Isolated Python omits the script directory; trust only this installed code folder.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from evidence_context import ContextTracker, display_tags
 from incident_time import clock_inventory, match_utc
 from datetime import timezone

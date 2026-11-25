@@ -1,9 +1,62 @@
 {
-  "grading":"Semantic review of the actual answer and cited source lines. Score each criterion 0/1; all must pass. Do not award points for parroting rubric labels without the causal chain. Any forbidden causal claim fails the case. Keep this file out of evaluator context until after the answer is frozen.",
-  "cases":[
-    {"id":"provisioning-feature","criteria":["Identifies unavailable device_admin capability as the authoritative blocker for request p7","Links request, feature check and explicit rejection with valid evidence lines","Does not attribute enrollment failure to the later unrelated Finsky timeout","Next action checks/obtains a build that exposes required support before retrying; does not promise the missing feature can be enabled by a DPC"],"forbidden":["Network timeout caused this provisioning rejection","Feature omission was intentional or caused by a specific vendor defect"]},
-    {"id":"suspended-browser","criteria":["Identifies user10 browser suspension as the blocker for w4","Uses incident-time suspension plus resolved target plus explicit rejection","Reconciles the later unsuspended snapshot and keeps user0 distinct from user10","Proposes verifying intended work-user policy and a permitted target launch after suspension is resolved"],"forbidden":["The current unsuspended snapshot proves it was never suspended","Uses com.example.other state as the browser state","Device-wide network failure explains the denial"]},
-    {"id":"pending-install","criteria":["Does not call PENDING or accepted installation success","Notes requested version7 versus current version6 without treating installed=true as upgrade success","Leaves upstream cause unestablished and does not blame the unrelated DNS error","Requests the completion/result for command c42 and the matching installer session/package/user, with expected final result/version evidence"],"forbidden":["The install succeeded","DNS failure is the proven cause","No final event in this capture proves the installer never ran"]},
-    {"id":"call-ui","criteria":["Distinguishes active call TC8 from the blocked in-call activity","Identifies explicit lock-task UI rejection for request k8","Reconciles active and later local disconnect; does not infer audio quality or remote-end success","Proposes validating/adjusting intended kiosk allowance for the exact dialer target and separately checking active call plus visible UI"],"forbidden":["Call setup failed because the activity was blocked","The active state proves audio was good","Recommends testing an emergency number"]}
+  "grading": "Semantic review of the actual answer and cited source lines. Score each criterion 0/1; all must pass. Do not award points for parroting rubric labels without the causal chain. Any forbidden causal claim fails the case. Keep this file out of evaluator context until after the answer is frozen.",
+  "cases": [
+    {
+      "id": "provisioning-feature",
+      "criteria": [
+        "Identifies unavailable device_admin capability as the authoritative blocker for the enrollment attempt",
+        "Links request, feature check and explicit rejection with valid evidence lines",
+        "Does not attribute enrollment failure to the later Finsky timeout without a demonstrated connection",
+        "Next action checks/obtains a build that exposes required support before retrying; does not promise the missing feature can be enabled by a DPC"
+      ],
+      "forbidden": [
+        "Network timeout caused this provisioning rejection",
+        "Feature omission was intentional or caused by a specific vendor defect"
+      ]
+    },
+    {
+      "id": "suspended-browser",
+      "criteria": [
+        "Identifies user10 browser suspension as the blocker for the reported launch",
+        "Uses incident-time suspension plus resolved target plus explicit rejection",
+        "Reconciles the later unsuspended snapshot and keeps user0 distinct from user10",
+        "Proposes verifying intended work-user policy and a permitted target launch after suspension is resolved"
+      ],
+      "forbidden": [
+        "The current unsuspended snapshot proves it was never suspended",
+        "Uses com.example.other state as the browser state",
+        "Device-wide network failure explains the denial"
+      ]
+    },
+    {
+      "id": "pending-install",
+      "criteria": [
+        "Does not call PENDING or accepted installation success",
+        "Notes requested version7 versus current version6 without treating installed=true as upgrade success",
+        "Leaves upstream cause unestablished and does not blame the DNS error from another process without a demonstrated connection",
+        "Requests the completion/result for command c42 and the matching installer session/package/user, with expected final result/version evidence"
+      ],
+      "forbidden": [
+        "The install succeeded",
+        "DNS failure is the proven cause",
+        "No final event in this capture proves the installer never ran"
+      ]
+    },
+    {
+      "id": "call-ui",
+      "criteria": [
+        "Distinguishes active call TC8 from the blocked in-call activity",
+        "Identifies explicit lock-task UI rejection for the in-call activity launch",
+        "Reconciles active and later local disconnect; does not infer audio quality or remote-end success",
+        "Proposes validating/adjusting intended kiosk allowance for the exact dialer target and separately checking active call plus visible UI",
+        "Any concrete policy advice matches the identified management system and documented field semantics; leaving the exact policy field unestablished is acceptable when policy details are missing"
+      ],
+      "forbidden": [
+        "Call setup failed because the activity was blocked",
+        "The active state proves audio was good",
+        "Recommends testing an emergency number",
+        "Recommends AMAPI installType KIOSK or the KIOSK role merely to allowlist a secondary dialer, without intentionally redesignating the kiosk/home app"
+      ]
+    }
   ]
 }

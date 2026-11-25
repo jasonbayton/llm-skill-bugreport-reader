@@ -8,6 +8,9 @@ from pathlib import Path
 import re
 import sys
 
+# Isolated Python omits the script directory; never add the report or working folder.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from evidence_context import ContextTracker, display_tags
 
 from report_io import iter_lines, redact, new_coverage, add_scan_arguments, limits_from_args

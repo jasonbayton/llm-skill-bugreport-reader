@@ -35,6 +35,8 @@ python3 -m unittest discover -s "$SKILL_BASE/tests" -v
 
 The skill instructs the assistant to **perform root-cause analysis automatically** after evidence collection. The scripts are optional accelerators, not the final answer: they cannot reliably infer causation from arbitrary log text. The assistant must resolve the timeline, test hypotheses, trace dependencies, assess contradictions and deliver a diagnosis in the same request. The default CLI masks common sensitive values in excerpts; source files are never modified. Avoid publishing unredacted output.
 
+The helpers also support isolated Python, for example `python3 -I "$SKILL_BASE/scripts/triage.py" /path/to/bugreport.zip`. They explicitly load sibling modules only from the installed script directory, not the report or working directory. Use a trusted skill copy: [`-I`](https://docs.python.org/3/using/cmdline.html#cmdoption-I) excludes user-site packages and environment/search-path influence, but is not an operating-system sandbox and does not make arbitrary downloaded Python code safe. `incident_time.py` is a library used by triage, not a standalone analysis CLI.
+
 ## Coverage and limits
 
 Nested ZIPs are read without extracting their members. Defaults are 600 candidates, 256 MiB per member, 768 MiB aggregate reads, three nested ZIP levels and 1 MiB per physical line. Narrow with `--member`, or deliberately increase `--max-members`, `--max-member-mib` and `--max-total-mib`. Skipped members, clipped lines, decoding replacements and null-byte lines are recorded. Null bytes in text candidates render as `[NUL]` without discarding the rest of a valid report. Known binary formats are excluded; mixed binary sections in text candidates still need interpretation.
@@ -81,7 +83,7 @@ For direct command-line use, clone into any directory and set `SKILL_BASE` to it
 
 ## Development and privacy
 
-Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 87 automated parser and behavior tests. The four diagnosis scenarios have had assisted review; that is not an independent model benchmark.
+Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 93 automated parser and behavior tests. The four diagnosis scenarios have one reported model run against earlier fixtures, scored by its operator; this is not independently audited or evidence of production accuracy. Current fixtures and scoring were revised afterwards and have not yet been model-evaluated. See [evaluation limits](evals/README.md).
 
 Keep real bugreports, customer data, generated analysis and credentials outside this repository. Test fixtures must be synthetic, using invented identifiers and example domains. When reporting a problem, provide a minimal synthetic reproduction; do not attach a real diagnostic archive. The ignore rules are only a convenience and do not replace reviewing what is committed.
 

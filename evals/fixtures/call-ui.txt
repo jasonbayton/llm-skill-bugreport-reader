@@ -1,10 +1,10 @@
 == dumpstate: 2026-04-13 14:05:00+0000
 [persist.sys.timezone]: [UTC]
 ------ SYSTEM LOG ------
-04-13 14:00:00.000 10123 400 410 I ExampleCaller: request=k8 user=0 initiating call id=TC8
+04-13 14:00:00.000 10123 400 410 I ExampleCaller: user=0 initiating call
 04-13 14:00:02.000 1000 500 510 I Telecom: call=TC8 state=ACTIVE
-04-13 14:00:03.000 1000 500 510 W ActivityTaskManager: request=k8 Lock Task Mode violation starting com.example.dialer/.InCallActivity user=0
-04-13 14:00:03.005 1000 500 510 W ActivityTaskManager: request=k8 START_CANCELED com.example.dialer/.InCallActivity
+04-13 14:00:03.000 1000 500 510 W ActivityTaskManager: Lock Task Mode violation starting com.example.dialer/.InCallActivity user=0
+04-13 14:00:03.005 1000 500 510 W ActivityTaskManager: START_CANCELED com.example.dialer/.InCallActivity
 ------ DUMP OF SERVICE telecom ------
 Call TC8, date=2026-04-13, user=0
   14:00:00.000 - SET_CONNECTING

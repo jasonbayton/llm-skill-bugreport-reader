@@ -24,6 +24,8 @@ Select the paths that match the complaint. Start with a direct outcome or policy
 
 **Avoid:** inferring an actual lock-task violation from kiosk context alone, or using capture-time `NONE` to rule out a past violation. A successfully drawn activity can still be internally blank or unready.
 
+**Policy advice:** identify the actual DPC/EMM and policy before prescribing a field. Do not set a secondary dialer/browser to AMAPI `installType: KIOSK` merely to allow its launch: this designates the kiosk application. Google's [dedicated-device examples](https://developers.google.com/android/management/policies/dedicated-devices) add supporting apps with another install type, and offer `kioskCustomLauncherEnabled` for a multi-app home screen. Changing launcher mode is a design decision, not an automatic repair. The current [AMAPI policy reference](https://developers.google.com/android/management/reference/rest/v1/enterprises.policies#InstallType) deprecates the `KIOSK` install type in favour of the `KIOSK` role; that role sets the preferred home app, so it is not a secondary-app permission either. `lockTaskAllowed` is also deprecated. Verify the applicable schema, intended kiosk design, installed/enabled target and observed launch enforcement; do not translate a generic allowlist recommendation into an unverified AMAPI field. A self-managed DPC's Android lock-task API and AMAPI policy are different configuration surfaces.
+
 **Next test:** capture the exact launch attempt and resolved component, inspect corresponding activity manager/task and policy decision logs.
 
 ## 3. Managed apps, Play, PackageInstaller and package availability
@@ -73,6 +75,8 @@ Standalone DropBox ANRs may use a dated system_app_anr/data_app_anr header witho
 **Sequence:** initiating app -> action/number type -> resolved dialler/connection service -> user and policy gate -> account/subscription selection -> new/connecting/dialling/active/disconnected -> disconnect reason.
 
 **Check:** whether a call actually reached active, role/default dialler, user restriction, permission plus app-op, SIM/service/radio state, lock task blocks on external UI, carrier restriction, emergency-call special routing. Distinguish call setup from UI visibility and audio/media quality.
+
+For a blocked in-call activity, apply the kiosk policy-advice checks above. Do not turn a secondary dialer into the kiosk/home app as a supposed allowlisting fix.
 
 **Avoid:** concluding that a failed third-party activity implies a failed Telecom operation; never print dialled numbers.
 
