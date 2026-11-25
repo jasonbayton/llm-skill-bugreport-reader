@@ -113,7 +113,7 @@ def analyse_overview(report: Path, *, member=None, limits=None, max_rows=2000, m
         if prop and prop[1] in BASICS:
             add('basics', BASICS[prop[1]], prop[2], 'observed system property', 'device',
                 f'[{prop[1]}]: [{prop[2]}]')
-        if text.lower().startswith('== dumpstate:'):
+        if re.match(r'^== dumpstate:\s*\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}\b', text, re.I):
             add('basics', 'Capture time', text.split(':', 1)[1].strip(), 'capture header', 'capture')
         pair = PAIR.match(raw)
 

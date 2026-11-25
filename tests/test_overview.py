@@ -38,6 +38,14 @@ class OverviewTests(unittest.TestCase):
     def demo(self):
         return analyse_overview(ROOT / 'tests/fixtures/overview.txt')
 
+    def test_dumpstate_completion_footer_is_not_a_capture_time(self):
+        report = analyse_overview(self.file('== dumpstate: 2026-02-11 12:10:00+0000\n'
+                                           '== dumpstate: done (id 5)\n'))
+        rows = report['captures'][0]['basics']
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['value'], '2026-02-11 12:10:00+0000')
+        self.assertEqual(report['captures'][0]['conflicts'], [])
+
     def test_owners_and_organization_owned_work_profile(self):
         capture = self.demo()['captures'][0]
         do, po = capture['ownership']
