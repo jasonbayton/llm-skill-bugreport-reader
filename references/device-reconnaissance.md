@@ -43,7 +43,7 @@ For each relevant package and dependency, determine *per user*:
 - Default HOME, browser, SMS, dialler/calling roles and intent handlers. Check which specific activity/service resolves, which user executes it, and whether a dependent package is blocked.
 - Process/startup, crash/ANR, service binding, storage context, app standby, doze/battery and foreground service.
 
-When reading a PackageManager dump, anchor on the exact `Package [name]` header and stop at the next package header. Read that block's user line; the nearby user line before the header belongs to the preceding package. Likewise, bind a JSON noncompliance reason to its enclosing package record, not the closest package mention elsewhere in the report.
+When reading a PackageManager dump, anchor on the exact `Package [name]` header and stop at the next package header. Read that block's user line; the nearby user line before the header belongs to the preceding package. Keep `Packages:` separate from `Hidden system packages:`: the latter describes factory/system-image copies, not current installed state. A missing subsection header leaves that distinction unknown. Likewise, bind a JSON noncompliance reason to its enclosing package record, not the closest package mention elsewhere in the report.
 
 ## Connectivity and hardware context
 

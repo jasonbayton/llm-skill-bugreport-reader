@@ -7,7 +7,6 @@ from pathlib import Path
 from report_io import iter_lines, new_coverage, redact, add_scan_arguments, limits_from_args
 from evidence_context import ContextTracker
 
-HEADER = re.compile(r'^(\s*)Package \[([^\]]+)\]\s*\(')
 USER = re.compile(r'^\s*User (\d+):\s*(.*)')
 FIELDS = re.compile(r'\b(installed|enabled|hidden|suspended|stopped|notLaunched|instant|virtual)=([^\s]+)')
 META = re.compile(r'\b(versionCode|installerPackageName|initiatingPackageName|originatingPackageName|userId|appId)=([^\s]+)')
@@ -25,21 +24,21 @@ def extract(report, package, *, member=None, limits=None):
     cov = new_coverage(); tracker = ContextTracker(); records = []; active = None
     for source, number, raw in iter_lines(report, coverage=cov, limits=limits, member_substring=member):
         context = tracker.feed(source, number, raw)
-        header = HEADER.match(raw)
-        if active and (source != active['source'] or context['boundary'] == 'section_boundary' or context['kind'] == 'log'):
+        if active and (source != active['source'] or context['package_line'] != active['line']):
             active = None
-        if header:
+        if context['package_line'] == number:
             active = None
-            if header[2] == package:
+            if context['package'] == package:
                 active = {'package': package, 'source': source, 'line': number, 'section': context['section'],
-                          'basis': 'capture_snapshot_not_incident_history', 'metadata': {}, 'users': [], '_indent': len(header[1])}
+                          'package_subsection': context['package_subsection'],
+                          'package_state_kind': context['package_state_kind'],
+                          'basis': ('factory_system_image_copy_not_current_state'
+                                    if context['package_state_kind'] == 'factory_system_image_copy'
+                                    else 'capture_snapshot_not_incident_history'),
+                          'metadata': {}, 'users': []}
                 records.append(active)
             continue
         if not active:
-            continue
-        # Leaving the indented package block invalidates it, even without a following Package header.
-        if raw.strip() and len(raw) - len(raw.lstrip()) <= active['_indent']:
-            active = None
             continue
         user = USER.match(raw)
         if user:
@@ -51,10 +50,8 @@ def extract(report, package, *, member=None, limits=None):
                 active['metadata']['versionName'] = {'value': redact(re.split(r'\s+\w+=', version[1], maxsplit=1)[0]), 'line': number}
             for key, value in META.findall(raw):
                 active['metadata'][key] = {'value': redact(value), 'line': number}
-    for record in records:
-        record.pop('_indent')
     return {'package': package, 'records': records, 'coverage': cov,
-            'notice': 'No matching block is not proof of absence. enabled is retained as a raw enum; default is not disabled. Version/installer metadata is package-level, user states are block-specific.'}
+            'notice': 'No matching block is not proof of absence. enabled is retained as a raw enum; default is not disabled. Version/installer metadata is package-level, user states are block-specific. Hidden system packages are factory copies, not current installed state; an absent subsection stays unknown.'}
 
 
 def main():

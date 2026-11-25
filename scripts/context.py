@@ -80,7 +80,7 @@ def main() -> int:
                                                     literal=args.literal, annotate=True):
             found = True
             marker = '>' if kind == 'match' else ' '
-            print(f"{marker} {member}:{number} [{metadata['kind']} / {metadata['section']} / {metadata['timeline_segment']} / boot={metadata['boot_epoch']}]: {excerpt}")
+            print(f"{marker} {member}:{number} [{metadata['kind']} / {metadata['section']} / buffer={metadata['buffer']} / {metadata['timeline_segment']} / boot={metadata['boot_epoch']} / package={metadata['package'] or 'unknown'} / subsection={metadata['package_subsection'] or 'unknown'} / package_state={metadata['package_state_kind']}]: {excerpt}")
         if not found:
             print('No matches in the selected text scope; absence is not proof the event did not occur.')
         if cov['stopped_early']:

@@ -11,6 +11,11 @@ A reusable, evidence-first **end-to-end diagnostic** skill for Android bugreport
 - `scripts/triage.py` - standard-library-only, read-only report triage (ZIP, TXT, directory), redacted by default.
 - `scripts/context.py` - targeted regex, literal or exact-line lookup with surrounding lines and a bounded match count.
 - `scripts/compare.py` - changes in observed properties, owner/lock-task snapshots and diagnostic signature counts across two reports.
+- `scripts/package_state.py` - exact package blocks, their own user rows, and active versus factory-copy subsection labels.
+- `scripts/incident_time.py` - per-member clock inventory and conservative UTC incident alignment.
+- `scripts/evidence_context.py` - section, buffer, chronology and package-scope annotations shared by the readers.
+- `scripts/report_io.py` - bounded text/archive reading, coverage accounting and best-effort redaction.
+- `references/capture-recipes.md` - concrete follow-up captures and expected confirming evidence.
 - `tests/` - synthetic tests and example report fragments.
 - `evals/` - synthetic diagnosis scenarios and a separate semantic scoring rubric.
 
@@ -54,7 +59,7 @@ python3 "$SKILL_BASE/scripts/package_state.py" /absolute/case/report.zip com.exa
 
 Every retained triage/context hit includes section, kind, buffer, timeline segment and boot confidence. Signal counts also expose occurrences_by_kind so snapshot and historical matches are not silently one undifferentiated total. Unknown sections stay unknown. Timestamped log records inside a service dump remain logs. Source/section/buffer switches separate chronology and reset carried boot context. Explicit boot IDs can identify a boot; boot-completed markers and uptime decreases are only candidates. Backward wall clocks split segments without proving reboot. Retained crash/ANR records start their own segments. Boundary samples are capped at 1000 with a total count; evidence annotations continue beyond that cap. These are conservative textual heuristics, not a complete Android boot-history parser.
 
-`package_state.py REPORT PACKAGE` returns each exact Package block separately, its version/installer metadata and its own User rows. It stops at another package, source, section or block boundary. Missing fields remain absent; raw `enabled=0` is not interpreted as disabled. Package-level `userId` can be an app ID, so only `--uid` explicitly applies full UID arithmetic. A shared/isolated UID does not identify a unique app. No missing block proves uninstallation. [AOSP UserHandle](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/core/java/android/os/UserHandle.java) defines the 100000 per-user range.
+`package_state.py REPORT PACKAGE` returns each exact Package block separately, its version/installer metadata and its own User rows. `package_subsection` distinguishes `Packages` from `Hidden system packages`; `package_state_kind` labels the latter as `factory_system_image_copy`, not current installed state. Missing subsection headers stay unknown. Triage and context share these package-scope annotations, including in Markdown, so user rows cannot silently borrow another package's identity. It stops at another package, source, section or block boundary. Missing fields remain absent; raw `enabled=0` is not interpreted as disabled. Package-level `userId` can be an app ID, so only `--uid` explicitly applies full UID arithmetic. A shared/isolated UID does not identify a unique app. No missing block proves uninstallation. [AOSP UserHandle](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/core/java/android/os/UserHandle.java) defines the 100000 per-user range.
 
 JSON/Markdown output paths must be new files outside an input directory. Existing files and report inputs are protected from overwrite. Redaction masks common credentials and identifiers, but is best-effort; paths and unrecognised formats may remain private. The comparison helper covers selected properties, owner/user/lock-task clues and signature counts, not a full policy or package diff.
 
@@ -76,7 +81,7 @@ For direct command-line use, clone into any directory and set `SKILL_BASE` to it
 
 ## Development and privacy
 
-Run `python3 -m unittest discover -s tests -v` from the repository root. The initial public version has 75 automated parser and behavior tests. The four diagnosis scenarios have had assisted review; that is not an independent model benchmark.
+Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 84 automated parser and behavior tests. The four diagnosis scenarios have had assisted review; that is not an independent model benchmark.
 
 Keep real bugreports, customer data, generated analysis and credentials outside this repository. Test fixtures must be synthetic, using invented identifiers and example domains. When reporting a problem, provide a minimal synthetic reproduction; do not attach a real diagnostic archive. The ignore rules are only a convenience and do not replace reviewing what is committed.
 

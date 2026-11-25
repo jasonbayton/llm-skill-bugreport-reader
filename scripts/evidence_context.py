@@ -3,10 +3,12 @@
 Epochs are local to a text member. A buffer boundary is not a reboot.
 """
 import re
-from datetime import datetime
 from pathlib import PurePosixPath
 
 SECTION = re.compile(r'^\s*-{6,}\s+(.+?)\s+-{6,}\s*$')
+DURATION = re.compile(r"^\s*-{6,}\s+\d+(?:\.\d+)?s was the duration of .+?-{6,}\s*$")
+PACKAGE = re.compile(r'^(\s*)Package \[([^\]]+)\]\s*\(')
+PACKAGE_SUBSECTION = re.compile(r'^(\s*)(Packages|Hidden system packages):\s*$')
 SERVICE = re.compile(r'^\s*DUMP OF SERVICE(?:\s+(?:CRITICAL|HIGH|NORMAL))?\s+([^:]+):')
 BUFFER = re.compile(r'^--------- (?:beginning of|switch to) (\S+)')
 LOG = re.compile(r'^\s*(?:\d{4}-)?\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?\s+(?:\S+\s+){0,3}[VDIWEFS]\s+\S+')
@@ -33,12 +35,15 @@ class ContextTracker:
         self.epoch_confidence = 'unknown'
         self.last_time = None
         self.last_uptime = None
+        self.package = self.package_line = self.package_indent = None
+        self.package_subsection = self.subsection_indent = None
 
     def feed(self, source, number, raw):
         if source != self.source:
             self.reset(source)
         event = None
-        section = SECTION.match(raw)
+        footer = DURATION.match(raw)
+        section = SECTION.match(raw) if not footer else None
         service = SERVICE.match(raw)
         buffer = BUFFER.match(raw)
         if section or service:
@@ -83,6 +88,29 @@ class ContextTracker:
             kind = 'snapshot'
         if kind == 'unknown' and 'tombstone' in PurePosixPath(source).name.lower():
             kind = 'retained_history'
+        if footer:
+            kind = 'collector'
+        # Package/User rows are meaningful only inside their own indented block.
+        # A factory copy must never inherit the active Packages subsection label.
+        if section or service or buffer or footer or kind in ('log', 'retained_history', 'collector'):
+            self.package = self.package_line = self.package_indent = None
+            self.package_subsection = self.subsection_indent = None
+        package = PACKAGE.match(raw) if kind not in ('log', 'retained_history', 'collector') else None
+        subsection = PACKAGE_SUBSECTION.match(raw) if kind not in ('log', 'retained_history', 'collector') else None
+        indent = len(raw) - len(raw.lstrip())
+        if subsection:
+            self.package_subsection = subsection[2]
+            self.subsection_indent = len(subsection[1])
+            self.package = self.package_line = self.package_indent = None
+        else:
+            if self.subsection_indent is not None and raw.strip() and indent <= self.subsection_indent:
+                self.package_subsection = self.subsection_indent = None
+            if package:
+                self.package, self.package_line, self.package_indent = package[2], number, len(package[1])
+            elif self.package and raw.strip() and indent <= self.package_indent:
+                self.package = self.package_line = self.package_indent = None
+        package_state_kind = {'Packages': 'active_package_settings',
+                              'Hidden system packages': 'factory_system_image_copy'}.get(self.package_subsection, 'unknown')
         boot = BOOT_ID.match(raw)
         if boot:
             if self.boot_id and self.boot_id != boot[1]:
@@ -119,4 +147,6 @@ class ContextTracker:
         return {'section': self.section, 'section_line': self.section_line, 'kind': kind,
                 'buffer': self.buffer, 'timeline_segment': f'{source}#s{self.segment}',
                 'boot_epoch': self.boot_epoch, 'boot_confidence': self.epoch_confidence,
+                'package': self.package, 'package_line': self.package_line,
+                'package_subsection': self.package_subsection, 'package_state_kind': package_state_kind,
                 'boundary': event}

@@ -8,7 +8,9 @@ Prepare an isolated run from any working directory:
 python3 "$SKILL_BASE/evals/prepare.py" --skill "$SKILL_BASE" --out /absolute/new-eval-run
 ```
 
-For each case, give a fresh evaluator only its request.txt, raw report and access to the skill's instructions/helpers/references. Do not expose rubric.json, other answers or prior diagnoses. Ask for the finished answer, not merely helper output. Use an independent agent only when delegation is authorized. This preparer does not start agents or make network requests.
+The preparer copies the skill's instructions, README, helpers, references and optional agents/assets into the run's `skill/` directory. It excludes `evals/`, `tests/`, Git metadata and Python caches. Every request points at this copy, never the original skill directory. Symlinked resources are rejected. Keep the run outside the source skill.
+
+For each case, give a fresh evaluator only its request.txt, raw report and the copied `skill/` directory. Do not mount or otherwise expose the original repository, rubric.json, other answers or prior diagnoses. Copying files is not an operating-system access restriction: a process with access to the original repository can still read it. Ask for the finished answer, not merely helper output. Use an independent agent only when delegation is authorized. This preparer does not start agents or make network requests.
 
 Freeze answers before opening rubric.json. A human or independently authorized judge should score each criterion and verify the cited lines against the raw fixture. Record answer path, model/version, skill file hashes, pass/fail per criterion, forbidden claims, elapsed time and tool usage. A case passes only when all criteria pass and no forbidden claim is present. Do not score on exact wording.
 

@@ -366,8 +366,20 @@ def analyse(report: Path, focus: str, packages: list[str], incident: datetime | 
     }
 
 
+def markdown_evidence(ev: dict) -> str:
+    tags = (f"kind={ev.get('kind', 'unknown')} / section={ev.get('section', 'unknown')} / "
+            f"buffer={ev.get('buffer')} / {ev.get('timeline_segment', '?')} / "
+            f"boot={ev.get('boot_epoch')} / package={ev.get('package') or 'unknown'} / "
+            f"subsection={ev.get('package_subsection') or 'unknown'} / "
+            f"package_state={ev.get('package_state_kind', 'unknown')}")
+    return f"- `{ev['source']}:{ev['line']}` {ev.get('timestamp') or ''} [{tags}]: `{ev['excerpt']}`"
+
+
 def as_markdown(report: dict, limit: int) -> str:
-    output = ["# Android bug-report triage", "", f"Source: `{report['source']}`", "", f"Focus: `{report['focus']}`. Incident: `{report['incident_local'] or 'not supplied'}`.", "", "**Important:** " + report["notice"], "", "## Coverage", "", f"{report['coverage']['scanned_lines']:,} lines across {report['coverage']['member_count']} text members. Unscanned/omitted archive members must not be assumed irrelevant.", "", "## Device profile (observed properties)", ""]
+    incident = report.get('incident_utc') or report.get('incident_local')
+    basis = 'UTC' if report.get('incident_utc') else 'device-local'
+    incident_text = f"`{incident}` ({basis})" if incident else 'not supplied'
+    output = ["# Android bug-report triage", "", f"Source: `{report['source']}`", "", f"Focus: `{report['focus']}`. Incident: {incident_text}.", "", "**Important:** " + report["notice"], "", "## Coverage", "", f"{report['coverage']['scanned_lines']:,} lines across {report['coverage']['member_count']} text members. Unscanned/omitted archive members must not be assumed irrelevant.", ""]
     if not report['coverage']['complete']:
         output += ['**INCOMPLETE scan: do not infer absence from these results.**', '']
     for item in report['coverage']['skipped']:
@@ -388,12 +400,17 @@ def as_markdown(report: dict, limit: int) -> str:
         output.append('**Multiple capture sources: no combined device profile or current-state snapshot. Select one source with --member before diagnosing or comparing.**')
         for capture in report['captures']:
             output.append(f"- Capture source: `{capture['source']}`")
-    if report.get('incident_utc'):
-        output.append(f"- UTC incident: {report['incident_utc']}; inspect per-evidence time_basis and time_alignment for unresolved clocks/DST.")
-    if report.get('timeline_boundary_count'):
-        output.append(f"- {report['timeline_boundary_count']} section/chronology boundaries; boot candidates are not confirmed reboots. JSON retains bounded boundary evidence.")
     if report['coverage']['member_filter']:
         output.append(f"- Scope restricted to members containing: `{report['coverage']['member_filter']}`")
+    output += ['', '## Incident timing and chronology', '']
+    if incident:
+        output.append(f"- Applied incident: {incident_text}; window: ±{report['incident_window_minutes']} minutes.")
+    else:
+        output.append('- No incident time supplied; no incident window applied.')
+    if report.get('incident_utc'):
+        output.append('- UTC alignment uses per-member clock evidence; inspect time_basis and time_alignment in JSON for unresolved clocks/DST.')
+    output.append(f"- {report.get('timeline_boundary_count', 0)} section/chronology boundaries; boot candidates are not confirmed reboots. JSON retains bounded boundary evidence.")
+    output += ['', '## Device profile (observed properties)', '']
     if report['profile_conflicts']:
         output.append('**Conflicting device properties: analyse each nested report/capture separately.**')
         for field, alternatives in report['profile_conflicts'].items():
@@ -424,19 +441,20 @@ def as_markdown(report: dict, limit: int) -> str:
         output.append(f"### {finding['id']} ({finding['focus']}, {finding['occurrences']} matches)")
         output.append(finding["interpretation"])
         for ev in finding["evidence"]:
-            output.append(f"- `{ev['source']}:{ev['line']}` {ev['timestamp'] or ''} [{ev.get('kind', 'unknown')} / {ev.get('section', 'unknown')} / {ev.get('timeline_segment', '?')} / boot={ev.get('boot_epoch')}]: `{ev['excerpt']}`")
+            output.append(markdown_evidence(ev))
         output.append("")
     if not report["findings"]:
         output.append("No indexed high-signal signature matched. Check the reported action and targeted context manually.")
     output += ["## Relevant state snapshots / mentions", ""]
+    output.append('Kinds distinguish history from snapshots. Package user rows belong only to the labelled enclosing package; unknown scope requires source context or package_state.py. Hidden system packages are factory copies, not current installed state.')
     for category, entries in report["state_snapshots_or_mentions"].items():
         output.append(f"### {category}")
         for ev in entries[:8]:
-            output.append(f"- `{ev['source']}:{ev['line']}`: `{ev['excerpt']}`")
+            output.append(markdown_evidence(ev))
     if report["package_context"]:
         output += ["", "## Recent lines containing requested packages", ""]
         for ev in report["package_context"]:
-            output.append(f"- `{ev['source']}:{ev['line']}` {ev['timestamp'] or ''} [{ev.get('kind', 'unknown')} / {ev.get('section', 'unknown')} / {ev.get('timeline_segment', '?')} / boot={ev.get('boot_epoch')}]: `{ev['excerpt']}`")
+            output.append(markdown_evidence(ev))
     if report['collection_diagnostics']:
         output += ['', '## Collection diagnostics (not application failure evidence)', '']
         for ev in report['collection_diagnostics'][:5]:
