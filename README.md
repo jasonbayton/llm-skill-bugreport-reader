@@ -101,7 +101,7 @@ For direct command-line use, clone into any directory and set `SKILL_BASE` to it
 
 ## Development and privacy
 
-Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 116 automated parser and behavior tests. The four diagnosis scenarios have one reported model run against earlier fixtures, scored by its operator; this is not independently audited or evidence of production accuracy. Current fixtures and scoring were revised afterwards and have not yet been model-evaluated. See [evaluation limits](evals/README.md).
+Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 116 automated parser and behavior tests. The four diagnosis scenarios have been run blind against the current fixtures and rubric once per case, with all four passing; a separate draft set of four larger synthetic cases passed three of four. Both runs were scored by their operator on one model, before the device overview was added; they are not independently audited or evidence of production accuracy, and the overview has not been model-evaluated. See [evaluation limits](evals/README.md).
 
 Keep real bugreports, customer data, generated analysis and credentials outside this repository. Test fixtures must be synthetic, using invented identifiers and example domains. When reporting a problem, provide a minimal synthetic reproduction; do not attach a real diagnostic archive. The ignore rules are only a convenience and do not replace reviewing what is committed.
 
