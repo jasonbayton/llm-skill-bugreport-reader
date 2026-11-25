@@ -32,8 +32,8 @@ POLICY = re.compile(r'^(?:m)?(?:disableCamera|cameraDisabled|disableScreenCaptur
                     r'isOrganizationOwnedDevice\w*|organizationOwned\w*)\b', re.I)
 PAIR = re.compile(r'^\s*([\w][\w .()-]*?)\s*[:=]\s*(.*?)\s*$')
 SECTIONS = ('basics', 'ownership', 'users', 'policies', 'restrictions', 'health')
-HEALTH_NOTE = ('Snapshots and retained aggregates are not a health certification. Battery charge and the Android '
-               'health flag do not establish battery wear or remaining full-charge capacity. Missing metrics are unknown.')
+HEALTH_NOTE = ('These readings describe the capture and any retained battery totals. They don’t establish '
+               'battery wear or a long-term performance trend. Values not captured remain unknown.')
 BATTERY_HEALTH = {'1': 'Unknown', '2': 'Good', '3': 'Overheat', '4': 'Dead', '5': 'Over voltage',
                   '6': 'Unspecified failure', '7': 'Cold'}
 BATTERY_FIELDS = {'level', 'scale', 'status', 'health', 'present', 'voltage', 'temperature', 'technology',
@@ -228,25 +228,27 @@ def analyse_overview(report: Path, *, member=None, limits=None, max_rows=2000, m
     return {'schema_version': 1, 'mode': 'device_overview', 'coverage': coverage,
             'captures': useful, 'unclassified_sources': [s for s, c in captures.items() if not any(c[key] for key in SECTIONS) and not c['packages']],
             'omitted': omitted, 'health_note': HEALTH_NOTE,
-            'notice': 'Under testing. Each text source is separate; no synthetic merged device. A snapshot is not incident history. Recorded policy is not automatically effective enforcement. Redaction is best-effort; review before sharing.'}
+            'notice': 'Each source is shown separately. Settings describe the capture, not an incident timeline. Check policy scope before calling a setting enforced. Review before sharing; redaction may miss sensitive details.'}
 
 
 def as_text(report):
-    parts = ['DEVICE OVERVIEW', report['notice'], report['health_note']]
+    parts = ['Device overview']
     for capture in report['captures']:
-        parts.append('\nSOURCE: ' + capture['source'])
+        parts.append('\nSource: ' + capture['source'])
         for group in SECTIONS:
-            parts.append('\n' + group.upper())
+            parts.append('\n' + {'basics': 'Device & build', 'ownership': 'Management', 'users': 'Users & profiles', 'policies': 'Policy settings', 'restrictions': 'Restrictions', 'health': 'Battery, memory & storage'}[group])
             for row in capture[group][:30]:
                 parts.append(f"- {row['label']}: {row['value']} [{row['scope']}; {row['basis']}; line {row['line']}]")
             if len(capture[group]) > 30:
                 parts.append('Additional rows are available in JSON/HTML.')
         parts.append(f"\nPackage blocks: {len(capture['packages'])} (active, factory or unknown subsection kept separate)")
         parts.extend(capture['gaps'] + capture['conflicts'])
-    parts.append('\nCoverage: ' + json.dumps(report['coverage']))
+    parts.append('\nAbout this reading: ' + report['notice'])
+    parts.append(report['health_note'])
+    parts.append('Files read and limits: ' + json.dumps(report['coverage']))
     parts.append('Omitted inventory rows: ' + json.dumps(report['omitted']))
     if not report['captures']:
-        parts.append('No supported state observations; this is not a clean bill of health.')
+        parts.append('No supported device readings found. Check the source format and reading limits.')
     return '\n'.join(parts) + '\n'
 
 

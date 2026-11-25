@@ -2,6 +2,14 @@
 
 Write the top line immediately after finding decisive evidence. Keep the first response concise; attach expanded findings only if useful.
 
+## Writing and presentation
+
+Use plain, direct British English. Lead with what happened or what the device shows, explain why it matters, then give the useful next step. Short sentences and natural contractions are welcome. Keep the technical detail that lets someone verify the answer; cut ceremony, promotional phrasing and repeated disclaimers. Avoid stock openings such as "a comprehensive overview", "key insights", "it's important to note" and "in conclusion". Put uncertainty beside the affected finding rather than repeating it in every section.
+
+Treat the sections below as an information contract, not a compulsory set of headings. A straightforward answer may need only a few paragraphs and its source lines. Don't pad an overview with an invented incident, a health score or a generic next-steps checklist. Leave development-status banners out of generated reports and answers; specific evidence gaps still belong in the output.
+
+An HTML report should feel designed: clear hierarchy, generous spacing, readable typography, a restrained colour palette and useful charts before the raw detail. Use the bundled overview renderer as a starting point. For other requested reports (specifications, memory, power or incident analysis), choose visuals that explain the supplied evidence: comparison bars, a scoped profile diagram or an actual event timeline. Show units, denominators, source pointers and missing data. Use genuine timestamps for trends; never create a time series from one snapshot. Keep long tables and raw evidence expandable. Check the result on desktop and mobile. Remain offline and escape report content.
+
 ## Confidence definitions
 
 - Confirmed: a coherent operation-specific causal sequence or authoritative decision, with material contradictions resolved.

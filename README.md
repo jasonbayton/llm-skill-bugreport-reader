@@ -17,6 +17,7 @@ A reusable, evidence-first **end-to-end diagnostic** skill for Android bugreport
 - `scripts/report_io.py` - bounded text/archive reading, coverage accounting and best-effort redaction.
 - `scripts/overview.py` - symptom-free management, policy, per-user app and health inventory, with optional JSON/HTML output.
 - `scripts/overview_html.py` - offline, script-free HTML presentation with source evidence and coverage details.
+- `scripts/overview_charts.py` - source-backed battery, memory, storage and per-user app charts.
 - `references/overview.md` - supported overview fields, evidence semantics and health limitations.
 - `references/capture-recipes.md` - concrete follow-up captures and expected confirming evidence.
 - `tests/` - synthetic tests and example report fragments.
@@ -56,7 +57,7 @@ python3 -I "$SKILL_BASE/scripts/overview.py" /path/to/report.zip --html /absolut
 
 Omit both output flags for a text overview. The HTML includes owner/admin records and organization-owned flags, user/profile topology, recorded camera/password/kiosk/logging fields, effective user-restriction-cache observations, app states by user, build/security properties, and supported battery, memory, storage, uptime and thermal observations. Every row has a source pointer. Text sources and factory app copies remain separate. Missing or conflicting data stays visible; no overall health score or production-readiness claim is generated.
 
-The HTML is standalone, responsive, printable and contains no JavaScript or external assets. Evidence expands locally. User display names and serial properties are omitted; remaining content may still be sensitive. Read [overview coverage and limits](references/overview.md) before interpreting unsupported/OEM fields, policy enforcement or battery wear. This is not a replacement for Battery Historian or a time-series power profiler.
+The HTML leads with a visual summary: battery charge, RAM, free storage and app counts by user. Detailed readings and source lines expand underneath. Charts show captured values with units and denominators; missing or conflicting values aren't guessed. It is standalone, responsive, printable and contains no JavaScript or external assets. Generated reports omit development-status banners. User display names and serial properties are omitted; remaining content may still be sensitive. Read [overview coverage and limits](references/overview.md) before interpreting unsupported/OEM fields, policy enforcement or battery wear. This is not a replacement for Battery Historian or a time-series power profiler.
 
 ## Diagnostic helper behaviour
 
@@ -100,7 +101,7 @@ For direct command-line use, clone into any directory and set `SKILL_BASE` to it
 
 ## Development and privacy
 
-Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 107 automated parser and behavior tests. The four diagnosis scenarios have one reported model run against earlier fixtures, scored by its operator; this is not independently audited or evidence of production accuracy. Current fixtures and scoring were revised afterwards and have not yet been model-evaluated. See [evaluation limits](evals/README.md).
+Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 114 automated parser and behavior tests. The four diagnosis scenarios have one reported model run against earlier fixtures, scored by its operator; this is not independently audited or evidence of production accuracy. Current fixtures and scoring were revised afterwards and have not yet been model-evaluated. See [evaluation limits](evals/README.md).
 
 Keep real bugreports, customer data, generated analysis and credentials outside this repository. Test fixtures must be synthetic, using invented identifiers and example domains. When reporting a problem, provide a minimal synthetic reproduction; do not attach a real diagnostic archive. The ignore rules are only a convenience and do not replace reviewing what is committed.
 
