@@ -131,8 +131,10 @@ def render(report):
         for key, label in [('ownership', 'Management'), ('users', 'Users & profiles'), ('policies', 'Policy'), ('restrictions', 'Restrictions'), ('packages', 'Apps'), ('health', 'Health'), ('basics', 'Device basics')]:
             out.append(f'<a href="#{prefix}-{key}">{e(label)}</a>')
         out.append('</nav>')
-        if capture['omitted_rows'] or any(report['omitted'].values()):
+        if any(count for key, count in capture['omitted_rows'].items() if key != 'long_values_clipped') or any(report['omitted'].values()):
             out.append('<p class="notice">Some rows were left out at the reader’s limits. Charts show only the retained values; see reading limits below.</p>')
+        elif capture['omitted_rows'].get('long_values_clipped'):
+            out.append('<p class="reading-note">' + str(capture['omitted_rows']['long_values_clipped']) + ' long values are shortened in the detail tables. The source has the full text; no rows were dropped.</p>')
         out.append(render_charts(capture, prefix))
         headings = [('ownership', 'Who manages this device?', 'Owner records identify the admin app and its user. An installed management app alone doesn’t establish ownership.'),
                     ('users', 'Users & profiles', 'User IDs and profile types come from the dump. Names and serial numbers are left out.'),

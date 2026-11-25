@@ -99,6 +99,12 @@ class ChartTests(unittest.TestCase):
         self.assertNotIn('Under testing', as_text(report))
         self.assertNotIn('Under testing', report['notice'])
 
+    def test_clipped_values_do_not_claim_inventory_rows_were_dropped(self):
+        self.capture['omitted_rows'] = {'long_values_clipped': 2}
+        html = render(self.report)
+        self.assertIn('2 long values are shortened', html)
+        self.assertNotIn('Some rows were left out', html)
+
 
 if __name__ == '__main__':
     unittest.main()
