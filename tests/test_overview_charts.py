@@ -26,7 +26,11 @@ class ChartTests(unittest.TestCase):
         self.assertEqual(storage['free'] / storage['total'], .1)
         self.assertTrue(all(r['source'] and r['line'] for r in storage['rows']))
         html = render_charts(self.capture, 'capture-1')
+        self.assertIn('90.0% used', html)
         self.assertIn('10.0% free', html)
+        self.assertIn('style="width:90.000%"', html)
+        self.assertIn('Used <b>108.0 GiB</b>', html)
+        self.assertIn('Free <b>12.0 GiB</b>', html)
         self.assertIn('Source values', html)
         self.assertIn(f"{storage['rows'][0]['source']}:{storage['rows'][0]['line']}", html)
 

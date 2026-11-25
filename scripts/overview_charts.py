@@ -138,14 +138,16 @@ def render_charts(capture, prefix):
     out.append(chart_panel('Memory', body, note, 'memory-chart'))
     body = ''
     for storage in metrics['storage']:
-        percent = 100 * storage['free'] / storage['total']
-        body += f'<div class="storage-heading"><span>{escape(storage["label"])}</span><strong>{percent:.1f}% free</strong></div>'
-        body += bar(percent, f'{storage["label"]}: {percent:.1f}% free', 'amber')
-        body += f'<div class="legend"><span>Free <b>{size(storage["free"])}</b></span><span>Total <b>{size(storage["total"])}</b></span></div>'
+        used = storage['total'] - storage['free']
+        percent = 100 * used / storage['total']
+        body += f'<div class="storage-heading"><span>{escape(storage["label"])}</span><strong>{percent:.1f}% used</strong></div>'
+        body += bar(percent, f'{storage["label"]}: {percent:.1f}% used, {100 - percent:.1f}% free', 'amber')
+        body += f'<div class="legend"><span><i class="used-dot"></i>Used <b>{size(used)}</b></span><span><i class="free-dot"></i>Free <b>{size(storage["free"])}</b></span></div>'
+        body += f'<p class="small muted">{size(storage["total"])} total · {100 - percent:.1f}% free</p>'
         body += sources(storage['rows'])
     if not body:
         body = '<p class="chart-missing">No comparable storage figures</p>'
-    out.append(chart_panel('Storage', body, 'Free space by partition. The full storage readings are below.', 'storage-chart'))
+    out.append(chart_panel('Storage', body, 'Filled bars show used space; the pale remainder is free.', 'storage-chart'))
     body = ''
     for user in metrics['apps'][:12]:
         count, total = user['installed'], user['records']
