@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 import sys
 
-from evidence_context import ContextTracker
+from evidence_context import ContextTracker, display_tags
 
 from report_io import iter_lines, redact, new_coverage, add_scan_arguments, limits_from_args
 
@@ -80,7 +80,7 @@ def main() -> int:
                                                     literal=args.literal, annotate=True):
             found = True
             marker = '>' if kind == 'match' else ' '
-            print(f"{marker} {member}:{number} [{metadata['kind']} / {metadata['section']} / buffer={metadata['buffer']} / {metadata['timeline_segment']} / boot={metadata['boot_epoch']} / package={metadata['package'] or 'unknown'} / subsection={metadata['package_subsection'] or 'unknown'} / package_state={metadata['package_state_kind']}]: {excerpt}")
+            print(f"{marker} {member}:{number} [{display_tags(metadata)}]: {excerpt}")
         if not found:
             print('No matches in the selected text scope; absence is not proof the event did not occur.')
         if cov['stopped_early']:

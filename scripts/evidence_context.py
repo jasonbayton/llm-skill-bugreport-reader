@@ -19,6 +19,20 @@ BOOT_EVENT = re.compile(r'\b(?:boot_completed|boot_progress_start|BOOT_COMPLETED
 HISTORY = re.compile(r'^\s*\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\s+\w+_(?:crash|anr)\s+\(')
 
 
+def display_tags(context):
+    """Show package scope only for package-dump rows, not unrelated logs."""
+    tags = (f"kind={context.get('kind', 'unknown')} / section={context.get('section', 'unknown')} / "
+            f"buffer={context.get('buffer')} / {context.get('timeline_segment', '?')} / "
+            f"boot={context.get('boot_epoch')}")
+    package_dump = (context.get('package') or context.get('package_subsection') or
+                    re.match(r'^DUMP OF SERVICE package\b', context.get('section', '')))
+    if package_dump and context.get('kind') not in ('log', 'retained_history', 'collector'):
+        tags += (f" / package={context.get('package') or 'unknown'} / "
+                 f"subsection={context.get('package_subsection') or 'unknown'} / "
+                 f"package_state={context.get('package_state_kind', 'unknown')}")
+    return tags
+
+
 class ContextTracker:
     def __init__(self):
         self.source = None

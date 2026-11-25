@@ -144,13 +144,21 @@ class OutputRegressions(unittest.TestCase):
         self.assertFalse((copied / '.git').exists())
         self.assertFalse(list(run.rglob('rubric.json')))
         self.assertFalse(any(path.is_symlink() for path in run.rglob('*')))
+        for name in ['SKILL.md', 'README.md']:
+            copied_text = (copied / name).read_text()
+            self.assertNotIn('evals/', copied_text)
+            self.assertNotIn('rubric', copied_text.lower())
+        self.assertIn('evals/README.md', (ROOT / 'SKILL.md').read_text())
         requests = json.loads((run / 'requests.json').read_text())
         self.assertEqual(len(requests), 4)
         for request in requests:
             self.assertIn(str(copied / 'SKILL.md'), request['prompt'])
             self.assertNotIn(str(ROOT), request['prompt'])
+            self.assertNotIn(request['id'], request['prompt'])
+            self.assertTrue(Path(request['artifact']).parent.name.startswith('case-'))
+        pending = next(request for request in requests if request['id'] == 'pending-install')
         result = subprocess.run([sys.executable, str(copied / 'scripts/package_state.py'),
-                                 str(run / 'pending-install/report.txt'), 'com.example.inventory'],
+                                 pending['artifact'], 'com.example.inventory'],
                                 cwd=run, capture_output=True, text=True, check=True)
         self.assertEqual(json.loads(result.stdout)['records'][0]['metadata']['versionCode']['value'], '6')
 
@@ -160,6 +168,41 @@ class OutputRegressions(unittest.TestCase):
                                      '--out', str(destination)], capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
         self.assertFalse((ROOT / 'must-not-create-eval-run').exists())
+
+    def test_display_omits_package_tags_for_logs_but_retains_dump_scope(self):
+        path = self.report('DUMP OF SERVICE package:\n'
+                           '01-01 12:00:00.000 1 2 I Tag: suspended=true\n'
+                           '  User 10: suspended=true\n')
+        rendered = as_markdown(analyse(path, 'auto', [], None, 15), 10)
+        lines = rendered.split('## Relevant state snapshots / mentions')[1].splitlines()
+        log_tags = next(line for line in lines if 'bugreport.txt:2`' in line).split(']:')[0]
+        dump_tags = next(line for line in lines if 'bugreport.txt:3`' in line).split(']:')[0]
+        self.assertNotIn('package=', log_tags)
+        self.assertNotIn('subsection=', log_tags)
+        self.assertNotIn('package_state=', log_tags)
+        self.assertIn('package=unknown', dump_tags)
+        result = subprocess.run([sys.executable, str(ROOT / 'scripts/context.py'), str(path),
+                                 '--pattern', 'suspended', '--context', '0'],
+                                capture_output=True, text=True, check=True)
+        self.assertNotIn('package=', result.stdout.splitlines()[0].split(']:')[0])
+        self.assertIn('package=unknown', result.stdout.splitlines()[1].split(']:')[0])
+
+    def test_target_package_rows_precede_other_packages(self):
+        report = analyse(ROOT / 'evals/fixtures/browser.txt', 'auto', ['com.example.browser'], None, 15)
+        rows = report['state_snapshots_or_mentions']['package_state']
+        self.assertEqual([row['line'] for row in rows[:2]], [15, 16])
+        self.assertEqual(rows[-1]['package'], 'com.example.other')
+        rendered = as_markdown(report, 10).split('## Relevant state snapshots / mentions')[1]
+        self.assertLess(rendered.index('browser.txt:16`'), rendered.index('browser.txt:11`'))
+
+    def test_late_target_package_survives_state_sample_cap(self):
+        blocks = [f'  Package [com.example.other{i}] (abc):\n    User 0: installed=true\n' for i in range(30)]
+        blocks.append('  Package [com.example.target] (def):\n    User 10: installed=false\n')
+        report = analyse(self.report('DUMP OF SERVICE package:\n' + ''.join(blocks)),
+                         'auto', ['com.example.target'], None, 15)
+        rows = report['state_snapshots_or_mentions']['package_state']
+        self.assertEqual(len(rows), 25)
+        self.assertEqual(rows[0]['package'], 'com.example.target')
 
 
 if __name__ == '__main__':

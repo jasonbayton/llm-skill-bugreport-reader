@@ -81,7 +81,7 @@ For direct command-line use, clone into any directory and set `SKILL_BASE` to it
 
 ## Development and privacy
 
-Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 84 automated parser and behavior tests. The four diagnosis scenarios have had assisted review; that is not an independent model benchmark.
+Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 87 automated parser and behavior tests. The four diagnosis scenarios have had assisted review; that is not an independent model benchmark.
 
 Keep real bugreports, customer data, generated analysis and credentials outside this repository. Test fixtures must be synthetic, using invented identifiers and example domains. When reporting a problem, provide a minimal synthetic reproduction; do not attach a real diagnostic archive. The ignore rules are only a convenience and do not replace reviewing what is committed.
 

@@ -18,7 +18,7 @@ from pathlib import Path
 import re
 import sys
 
-from evidence_context import ContextTracker
+from evidence_context import ContextTracker, display_tags
 from incident_time import clock_inventory, match_utc
 from datetime import timezone
 
@@ -283,9 +283,13 @@ def analyse(report: Path, focus: str, packages: list[str], incident: datetime | 
                 package_incident_last.append(entry)
         line_matched = relevant_package
         for group, pattern in STATE_FILTERS:
-            if len(state[group]) < 25 and pattern.search(raw):
-                # Keep state snippets small and separate from historical event findings.
+            if (packages or len(state[group]) < 25) and pattern.search(raw):
+                # Keep a bounded sample, retaining target rows even after unrelated blocks.
                 state[group].append(entry or evidence(member, line_no, raw, incident, minutes, context, clocks))
+                if packages:
+                    state[group].sort(key=lambda ev: 0 if ev.get('package') in packages else
+                                      (1 if not ev.get('package') else 2))
+                    del state[group][25:]
         for sig, pattern, gates in compiled:
             if gates and ascii_line and not any(token in lower for token in gates):
                 continue
@@ -344,6 +348,7 @@ def analyse(report: Path, focus: str, packages: list[str], incident: datetime | 
     return {
         "source": str(report),
         "focus": focus,
+        "requested_packages": packages,
         "incident_local": incident.isoformat() if incident and not utc else None,
         "incident_utc": incident.isoformat() if utc else None,
         "time_alignment": clocks,
@@ -367,11 +372,7 @@ def analyse(report: Path, focus: str, packages: list[str], incident: datetime | 
 
 
 def markdown_evidence(ev: dict) -> str:
-    tags = (f"kind={ev.get('kind', 'unknown')} / section={ev.get('section', 'unknown')} / "
-            f"buffer={ev.get('buffer')} / {ev.get('timeline_segment', '?')} / "
-            f"boot={ev.get('boot_epoch')} / package={ev.get('package') or 'unknown'} / "
-            f"subsection={ev.get('package_subsection') or 'unknown'} / "
-            f"package_state={ev.get('package_state_kind', 'unknown')}")
+    tags = display_tags(ev)
     return f"- `{ev['source']}:{ev['line']}` {ev.get('timestamp') or ''} [{tags}]: `{ev['excerpt']}`"
 
 
@@ -447,6 +448,8 @@ def as_markdown(report: dict, limit: int) -> str:
         output.append("No indexed high-signal signature matched. Check the reported action and targeted context manually.")
     output += ["## Relevant state snapshots / mentions", ""]
     output.append('Kinds distinguish history from snapshots. Package user rows belong only to the labelled enclosing package; unknown scope requires source context or package_state.py. Hidden system packages are factory copies, not current installed state.')
+    if report.get('requested_packages'):
+        output.append('Requested-package rows are shown first, followed by unscoped mentions and other packages; this remains a bounded sample.')
     for category, entries in report["state_snapshots_or_mentions"].items():
         output.append(f"### {category}")
         for ev in entries[:8]:

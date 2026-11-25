@@ -8,7 +8,7 @@ Prepare an isolated run from any working directory:
 python3 "$SKILL_BASE/evals/prepare.py" --skill "$SKILL_BASE" --out /absolute/new-eval-run
 ```
 
-The preparer copies the skill's instructions, README, helpers, references and optional agents/assets into the run's `skill/` directory. It excludes `evals/`, `tests/`, Git metadata and Python caches. Every request points at this copy, never the original skill directory. Symlinked resources are rejected. Keep the run outside the source skill.
+The preparer copies the skill's instructions, README, helpers, references and optional agents/assets into the run's `skill/` directory. It excludes `evals/`, `tests/`, Git metadata and Python caches, and removes development/evaluation pointers from the copied instructions and README. Every request points at this copy, never the original skill directory. Case directories use neutral numbers so their names do not reveal expected diagnoses. The coordinator's `requests.json` retains case IDs for scoring; do not give that index to evaluators. Symlinked resources are rejected. Keep the run outside the source skill.
 
 For each case, give a fresh evaluator only its request.txt, raw report and the copied `skill/` directory. Do not mount or otherwise expose the original repository, rubric.json, other answers or prior diagnoses. Copying files is not an operating-system access restriction: a process with access to the original repository can still read it. Ask for the finished answer, not merely helper output. Use an independent agent only when delegation is authorized. This preparer does not start agents or make network requests.
 

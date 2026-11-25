@@ -2,6 +2,7 @@
 """Prepare diagnosis requests with a rubric-free copy of the skill."""
 import argparse
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -10,6 +11,12 @@ from pathlib import Path
 SKILL_FILES = ('SKILL.md', 'README.md')
 SKILL_DIRECTORIES = ('scripts', 'references', 'agents', 'assets')
 EXCLUDED = shutil.ignore_patterns('evals', 'tests', '__pycache__', '*.pyc', '.git')
+
+
+def evaluator_document(text: str) -> str:
+    """Remove development-only pointers from the evaluator's document copy."""
+    return '\n'.join(line for line in text.splitlines()
+                     if not re.search(r'evals/|tests/|unittest|rubric|diagnosis scenarios', line, re.I)) + '\n'
 
 
 def copy_skill(source: Path, destination: Path) -> None:
@@ -22,7 +29,7 @@ def copy_skill(source: Path, destination: Path) -> None:
         if resource.is_dir():
             shutil.copytree(resource, destination / resource.name, ignore=EXCLUDED)
         elif resource.is_file():
-            shutil.copyfile(resource, destination / resource.name)
+            (destination / resource.name).write_text(evaluator_document(resource.read_text()))
 
 
 def prepare(skill: Path, output: Path) -> int:
@@ -41,8 +48,8 @@ def prepare(skill: Path, output: Path) -> int:
     isolated_skill = output / 'skill'
     copy_skill(skill, isolated_skill)
     requests = []
-    for case in cases:
-        case_directory = output / case['id']
+    for number, case in enumerate(cases, 1):
+        case_directory = output / f'case-{number:03d}'
         case_directory.mkdir()
         artifact = case_directory / 'report.txt'
         shutil.copyfile(evaluation_source / case['fixture'], artifact)
