@@ -1,4 +1,4 @@
 interface:
-  display_name: "Android Bugreport Diagnosis"
-  short_description: "Trace Android failures to evidence-backed causes"
-  default_prompt: "Use $android-enterprise-bugreport to investigate this report, establish the first failed transition, and explain the cause or smallest decisive next test."
+  display_name: "Android Device & Bugreport Analysis"
+  short_description: "Review device state or diagnose Android failures"
+  default_prompt: "Use $android-enterprise-bugreport to analyse this report: overview management and health when no symptom is supplied, or trace the reported failure to evidence-backed findings."

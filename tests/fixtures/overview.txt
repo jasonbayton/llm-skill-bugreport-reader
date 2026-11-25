@@ -1,0 +1,115 @@
+== dumpstate: 2026-02-11 12:10:00+0000
+------ SYSTEM PROPERTIES ------
+[ro.product.manufacturer]: [Example Devices]
+[ro.product.model]: [Enterprise Demo]
+[ro.build.version.release]: [16]
+[ro.build.version.sdk]: [36]
+[ro.build.id]: [EXAMPLE.001]
+[ro.build.version.security_patch]: [2026-02-05]
+[ro.boot.verifiedbootstate]: [green]
+[ro.boot.flash.locked]: [1]
+[ro.boot.vbmeta.device_state]: [locked]
+[persist.sys.timezone]: [Europe/London]
+[ro.serialno]: [synthetic-private-serial]
+DUMP OF SERVICE device_policy:
+Current Device Policy Manager state:
+  Device Owner: none
+  Profile Owner (User 10):
+    admin=ComponentInfo{com.google.android.apps.work.clouddpc/.receivers.CloudDeviceAdminReceiver}
+    package=com.google.android.apps.work.clouddpc
+    isOrganizationOwnedDevice=true
+  Enabled Device Admins (User 10, provisioningState: 3):
+    com.google.android.apps.work.clouddpc/.receivers.CloudDeviceAdminReceiver:
+      uid=1010123
+      policies:
+        disable-camera
+      disableCamera=false
+      disableScreenCapture=true
+      passwordQuality=0x50000
+      minimumPasswordLength=8
+      isNetworkLoggingEnabled=true
+      userRestrictions:
+        no_install_unknown_sources=true
+      parentAdmin:
+        disableCamera=true
+  mSecurityLoggingEnabled=false
+  mLockTaskPackages={10=[com.example.kiosk, com.example.browser]}
+  mLockTaskFeatures={10=0}
+DUMP OF SERVICE user:
+Current user: 0
+Users:
+  UserInfo{0:Personal Example:13} serialNo=0 isPrimary=true
+    Type: android.os.usertype.full.SYSTEM
+    State: RUNNING_UNLOCKED
+    Restrictions:
+      no_sms=false
+    Effective restrictions:
+      no_sms=false
+  UserInfo{10:Work Example:1030} serialNo=10 isPrimary=false parentId=0
+    Type: android.os.usertype.profile.MANAGED
+    State: RUNNING_UNLOCKED
+    Has profile owner: true
+    Restrictions:
+      null
+    Device policy restrictions:
+      no_install_unknown_sources=true
+    Effective restrictions:
+      no_install_unknown_sources=true
+      no_camera=false
+Device properties:
+  Device policy global restrictions:
+    no_factory_reset=true
+DUMP OF SERVICE package:
+Packages:
+  Package [com.example.kiosk] (a1):
+    versionCode=42
+    versionName=4.2
+    installerPackageName=com.example.store
+    User 0: installed=false hidden=false suspended=false stopped=true enabled=0
+    User 10: installed=true hidden=false suspended=false stopped=false enabled=0
+  Package [com.example.browser] (b1):
+    versionCode=120
+    versionName=12.0
+    installerPackageName=com.example.store
+    User 0: installed=true hidden=false suspended=false stopped=false enabled=0
+    User 10: installed=true hidden=false suspended=true stopped=false enabled=0
+Hidden system packages:
+  Package [com.example.browser] (b2):
+    versionCode=100
+    User 0: installed=true hidden=false suspended=false stopped=false enabled=0
+DUMP OF SERVICE battery:
+Current Battery Service state:
+  AC powered: false
+  USB powered: true
+  status: 2
+  health: 2
+  present: true
+  level: 78
+  scale: 100
+  voltage: 4120
+  temperature: 295
+  technology: Li-ion
+  Charge counter: 3100000
+  cycle count: 94
+DUMP OF SERVICE batterystats:
+  Start clock time: 2026-02-10-08-00-00
+  Time on battery: 3h 20m 0s realtime, 2h 1m 0s uptime
+  Estimated battery capacity: 4200 mAh
+  Last learned battery capacity: 4080 mAh
+DUMP OF SERVICE meminfo:
+  Total RAM: 8,000,000K (status normal)
+  Free RAM: 2,500,000K (1,500,000K cached pss + 1,000,000K free)
+  Used RAM: 5,300,000K
+  Lost RAM: 200,000K
+DUMP OF SERVICE diskstats:
+  Data-Free: 12582912K / 125829120K total = 10% free
+  File-based Encryption: true
+------ UPTIME (/proc/uptime) ------
+123456.78 456789.00
+DUMP OF SERVICE thermalservice:
+  Thermal Status: 0
+------ SYSTEM LOG ------
+--------- beginning of system
+02-11 12:00:00.000 1000 100 110 I DevicePolicyManager: disableCamera=true
+02-11 12:00:01.000 1000 100 110 I PackageManager: User 10: installed=false suspended=false
+------ 0.123s was the duration of 'SYSTEM LOG' ------

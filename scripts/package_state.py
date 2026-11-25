@@ -24,37 +24,61 @@ def uid_identity(uid):
             'caveat': 'Arithmetic identity only; shared/isolated UID does not identify one package. A package-level userId/appId is not necessarily a full per-user UID.'}
 
 
-def extract(report, package, *, member=None, limits=None):
-    cov = new_coverage(); tracker = ContextTracker(); records = []; active = None
-    for source, number, raw in iter_lines(report, coverage=cov, limits=limits, member_substring=member):
-        context = tracker.feed(source, number, raw)
+class PackageCollector:
+    """Shared streaming collector for a selected package or a bounded inventory."""
+    def __init__(self, package=None, max_records=5000):
+        self.package = package
+        self.max_records = max_records
+        self.records = []
+        self.active = None
+        self.omitted_records = 0
+        self.omitted_users = 0
+
+    def feed(self, source, number, raw, context):
+        active = self.active
         if active and (source != active['source'] or context['package_line'] != active['line']):
-            active = None
+            self.active = active = None
         if context['package_line'] == number:
-            active = None
-            if context['package'] == package:
-                active = {'package': package, 'source': source, 'line': number, 'section': context['section'],
-                          'package_subsection': context['package_subsection'],
-                          'package_state_kind': context['package_state_kind'],
-                          'basis': ('factory_system_image_copy_not_current_state'
-                                    if context['package_state_kind'] == 'factory_system_image_copy'
-                                    else 'capture_snapshot_not_incident_history'),
-                          'metadata': {}, 'users': []}
-                records.append(active)
-            continue
+            self.active = None
+            if self.package is None or context['package'] == self.package:
+                if len(self.records) >= self.max_records:
+                    self.omitted_records += 1
+                    return
+                self.active = {'package': context['package'], 'source': source, 'line': number,
+                               'section': context['section'],
+                               'package_subsection': context['package_subsection'],
+                               'package_state_kind': context['package_state_kind'],
+                               'basis': ('factory_system_image_copy_not_current_state'
+                                         if context['package_state_kind'] == 'factory_system_image_copy'
+                                         else 'capture_snapshot_not_incident_history'),
+                               'metadata': {}, 'users': []}
+                self.records.append(self.active)
+            return
         if not active:
-            continue
+            return
         user = USER.match(raw)
         if user:
-            values = dict(FIELDS.findall(user[2]))
-            active['users'].append({'user_id': int(user[1]), 'line': number, 'state': values})
+            if len(active['users']) >= 1000:
+                self.omitted_users += 1
+            else:
+                active['users'].append({'user_id': int(user[1]), 'line': number,
+                                        'state': dict(FIELDS.findall(user[2]))})
         else:
             version = re.match(r'^\s*versionName=(.*)', raw)
             if version:
                 active['metadata']['versionName'] = {'value': redact(re.split(r'\s+\w+=', version[1], maxsplit=1)[0]), 'line': number}
             for key, value in META.findall(raw):
                 active['metadata'][key] = {'value': redact(value), 'line': number}
-    return {'package': package, 'records': records, 'coverage': cov,
+
+
+def extract(report, package, *, member=None, limits=None):
+    coverage = new_coverage()
+    tracker = ContextTracker()
+    collector = PackageCollector(package)
+    for source, number, raw in iter_lines(report, coverage=coverage, limits=limits, member_substring=member):
+        collector.feed(source, number, raw, tracker.feed(source, number, raw))
+    return {'package': package, 'records': collector.records, 'coverage': coverage,
+            'omitted_records': collector.omitted_records, 'omitted_users': collector.omitted_users,
             'notice': 'No matching block is not proof of absence. enabled is retained as a raw enum; default is not disabled. Version/installer metadata is package-level, user states are block-specific. Hidden system packages are factory copies, not current installed state; an absent subsection stays unknown.'}
 
 

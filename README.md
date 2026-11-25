@@ -15,6 +15,9 @@ A reusable, evidence-first **end-to-end diagnostic** skill for Android bugreport
 - `scripts/incident_time.py` - per-member clock inventory and conservative UTC incident alignment.
 - `scripts/evidence_context.py` - section, buffer, chronology and package-scope annotations shared by the readers.
 - `scripts/report_io.py` - bounded text/archive reading, coverage accounting and best-effort redaction.
+- `scripts/overview.py` - symptom-free management, policy, per-user app and health inventory, with optional JSON/HTML output.
+- `scripts/overview_html.py` - offline, script-free HTML presentation with source evidence and coverage details.
+- `references/overview.md` - supported overview fields, evidence semantics and health limitations.
 - `references/capture-recipes.md` - concrete follow-up captures and expected confirming evidence.
 - `tests/` - synthetic tests and example report fragments.
 - `evals/` - synthetic diagnosis scenarios and a separate semantic scoring rubric.
@@ -42,6 +45,20 @@ The helpers also support isolated Python, for example `python3 -I "$SKILL_BASE/s
 Nested ZIPs are read without extracting their members. Defaults are 600 candidates, 256 MiB per member, 768 MiB aggregate reads, three nested ZIP levels and 1 MiB per physical line. Narrow with `--member`, or deliberately increase `--max-members`, `--max-member-mib` and `--max-total-mib`. Skipped members, clipped lines, decoding replacements and null-byte lines are recorded. Null bytes in text candidates render as `[NUL]` without discarding the rest of a valid report. Known binary formats are excluded; mixed binary sections in text candidates still need interpretation.
 
 The JSON `coverage` object is part of the evidence. A complete scan means selected text candidates were read; it does not prove all relevant events were captured. First/last examples and hit-limited context are samples. Separate nested captures before drawing causal conclusions, and identify renamed duplicates by hash. Counts can include repeated copies of the same log event.
+
+## Device overview and HTML
+
+Ask the assistant to **analyse this device** for a management/health overview without inventing a symptom. Add **generate an HTML report** for a shareable local overview, or ask for it alongside a diagnosis. Direct usage:
+
+```sh
+python3 -I "$SKILL_BASE/scripts/overview.py" /path/to/report.zip --html /absolute/case/device.html --json /absolute/case/device.json
+```
+
+Omit both output flags for a text overview. The HTML includes owner/admin records and organization-owned flags, user/profile topology, recorded camera/password/kiosk/logging fields, effective user-restriction-cache observations, app states by user, build/security properties, and supported battery, memory, storage, uptime and thermal observations. Every row has a source pointer. Text sources and factory app copies remain separate. Missing or conflicting data stays visible; no overall health score or production-readiness claim is generated.
+
+The HTML is standalone, responsive, printable and contains no JavaScript or external assets. Evidence expands locally. User display names and serial properties are omitted; remaining content may still be sensitive. Read [overview coverage and limits](references/overview.md) before interpreting unsupported/OEM fields, policy enforcement or battery wear. This is not a replacement for Battery Historian or a time-series power profiler.
+
+## Diagnostic helper behaviour
 
 Identical nested ZIPs are counted once by SHA-256 (aliases listed in `duplicate_archives`); a member-filtered scan can select any alias. Mac resource-fork entries are ignored as metadata. Distinct property/snapshot sources populate `captures`, and `multiple_capture_sources` suppresses a misleading combined device profile/current snapshot. The comparison helper requires one such source per input. Repeated log buffers inside a capture are not automatically deduplicated.
 
@@ -83,7 +100,7 @@ For direct command-line use, clone into any directory and set `SKILL_BASE` to it
 
 ## Development and privacy
 
-Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 93 automated parser and behavior tests. The four diagnosis scenarios have one reported model run against earlier fixtures, scored by its operator; this is not independently audited or evidence of production accuracy. Current fixtures and scoring were revised afterwards and have not yet been model-evaluated. See [evaluation limits](evals/README.md).
+Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 107 automated parser and behavior tests. The four diagnosis scenarios have one reported model run against earlier fixtures, scored by its operator; this is not independently audited or evidence of production accuracy. Current fixtures and scoring were revised afterwards and have not yet been model-evaluated. See [evaluation limits](evals/README.md).
 
 Keep real bugreports, customer data, generated analysis and credentials outside this repository. Test fixtures must be synthetic, using invented identifiers and example domains. When reporting a problem, provide a minimal synthetic reproduction; do not attach a real diagnostic archive. The ignore rules are only a convenience and do not replace reviewing what is committed.
 

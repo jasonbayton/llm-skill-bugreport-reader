@@ -1,11 +1,24 @@
 ---
 name: android-enterprise-bugreport
-description: Diagnose Android bugreport ZIPs, dumpstate, dumpsys, logcat and diagnostic reports, including AMAPI, Android Device Policy/CloudDPC, work profile/COPE, zero-touch provisioning, managed installs, kiosk and policy failures. Correlate failed operations across components and captures. Use for evidence-led incident analysis, not general Android development or policy/API questions without diagnostic evidence.
+description: Analyse Android bugreport ZIPs, dumpstate, dumpsys, logcat and diagnostic reports. Diagnose AMAPI, Android Device Policy/CloudDPC, work profile/COPE, provisioning, install and kiosk failures, or provide a device management and health overview with optional offline HTML when asked to analyse a device without a symptom. Use supplied diagnostic evidence, not general Android development or policy/API questions without a report.
 ---
 
 # Android bugreport diagnosis
 
 Find the earliest supported blocker and explain its link to the symptom. Running helpers or listing errors is not a completed diagnosis. When evidence cannot establish a cause, report the strongest observed boundary and the smallest discriminating follow-up.
+
+## Device overview without a symptom
+
+For requests such as "analyse this device", use the [overview workflow](references/overview.md) rather than inventing an incident or following the root-cause steps below. Summarise ownership, users/profiles, recorded policies, effective restriction observations, apps by user, device basics and health indicators. Label missing evidence and conflicts. A stored policy is not automatically enforced; battery charge/health flags are not battery wear measurements.
+
+Set `SKILL_BASE` to the absolute skill directory. Generate HTML when requested, or use the text/JSON overview to write a concise answer:
+
+~~~sh
+python3 -I "$SKILL_BASE/scripts/overview.py" /absolute/case/report.zip
+python3 -I "$SKILL_BASE/scripts/overview.py" /absolute/case/report.zip --html /absolute/case/device-overview.html --json /absolute/case/device-overview.json
+~~~
+
+Choose new output files outside the source directory; use `--member` to narrow an archive. Review the output and its gaps before delivering it under the [overview response contract](references/report-format.md). For a supplied symptom, an HTML overview may accompany the requested diagnosis; it does not replace causal analysis. HTML is offline and contains sensitive source observations even after best-effort redaction.
 
 ## Workflow
 
