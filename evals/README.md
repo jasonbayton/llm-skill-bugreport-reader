@@ -1,8 +1,10 @@
 # Diagnosis evaluations
 
-These four synthetic cases test conclusions and evidence discipline, not just parsing. Cases cover unsupported provisioning, a suspended work-user browser with a later contradictory snapshot, a pending update with an older installed version, and an active call with rejected UI. No real customer data is included.
+These five synthetic cases test conclusions and evidence discipline, not just parsing. Cases cover unsupported provisioning, a suspended work-user browser with a later contradictory snapshot, a pending update with an older installed version, an active call with rejected UI, and an unindexed peripheral symptom requiring app/service/vendor investigation. No real customer data is included.
 
 ## Results and limits
+
+The unindexed-symptom case was added on 26 November 2026. Its helper check verifies that triage finds no signatures while the raw fixture contains a traceable failure. It has not been answered and scored by a fresh model; parser/preparation checks alone do not establish that the fallback instruction works.
 
 One run of the earlier fixtures was reported on 25 November 2026: four fresh model sessions, four criteria passed per case, and no old-rubric forbidden claims. The operator reported freezing answer hashes before scoring and checking every cited line. The same operator judged the answers, with one run per case on one model; the answer artifacts, hashes and exact model version are not included here, so these results have not been independently audited. Helpers were not used. One answer reportedly prescribed AMAPI `installType: KIOSK` for a secondary dialer, an incorrect policy recommendation that the old rubric did not catch. An old-rubric pass was therefore not a fully correct answer.
 
@@ -14,7 +16,7 @@ A separate draft set of four larger synthetic cases (1,300–8,000 lines, one ne
 
 Both runs used one model with one run per case, and were scored by the operator who wrote the fixtures, so they are not independent. They predate the device overview, which has not been model-evaluated.
 
-The reports remain only 11–16 lines long. They are reasoning smoke tests, not a tooling or realistic-correlation benchmark. A stronger future suite needs longer interleaved captures, multiple users/attempts, missing links, ordinary unlabeled noise and evidence across sections/members. Record whether helpers actually ran, how their output affected the answer and whether the proposed fix uses documented policy semantics. Include cases whose correct result is insufficient evidence. Repeated runs and an independent judge are still needed before making accuracy or production-readiness claims.
+The original four reports remain only 11–16 lines long; the unindexed-symptom fixture is longer but still compact. They are reasoning smoke tests, not a tooling or realistic-correlation benchmark. A stronger future suite needs longer interleaved captures, multiple users/attempts, missing links, ordinary unlabeled noise and evidence across sections/members. Record whether helpers actually ran, how their output affected the answer and whether the proposed fix uses documented policy semantics. Include cases whose correct result is insufficient evidence. Repeated runs and an independent judge are still needed before making accuracy or production-readiness claims.
 
 ## Run preparation
 
@@ -30,4 +32,4 @@ For each case, give a fresh evaluator only its request.txt, raw report and the c
 
 Freeze answers before opening rubric.json. A human or independently authorized judge should score each criterion and verify the cited lines against the raw fixture. Record answer path, model/version, skill file hashes, pass/fail per criterion, forbidden claims, elapsed time and tool usage. A case passes only when all criteria pass and no forbidden claim is present. Do not score on exact wording.
 
-To compare wording changes, use the same requests, artifacts and model/settings in separate baseline and candidate runs, ideally repeated; label judge uncertainty. Keep expected answers out of both runs. Four cases are a small regression set, not broad accuracy measurement. Parser tests, helper runs, a rubric written by the author, and a self-reviewed diagnosis are not a blind independent benchmark. Store run artifacts in the case workspace, outside the installed skill.
+To compare wording changes, use the same requests, artifacts and model/settings in separate baseline and candidate runs, ideally repeated; label judge uncertainty. Keep expected answers out of both runs. Five cases are a small regression set, not broad accuracy measurement. Parser tests, helper runs, a rubric written by the author, and a self-reviewed diagnosis are not a blind independent benchmark. Store run artifacts in the case workspace, outside the installed skill.

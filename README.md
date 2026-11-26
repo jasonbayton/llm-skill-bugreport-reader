@@ -2,7 +2,7 @@
 
 > **Under active testing — not production-ready.** This skill is still being tested and refined. Diagnostic accuracy and reliability have not yet been established for production use. Review findings against the original evidence; passing automated tests does not guarantee a correct diagnosis.
 
-A reusable, evidence-first **end-to-end diagnostic** skill for Android bugreport ZIP/TXT archives. It reconstructs enterprise management and device state, follows an incident across processes and framework services, tests competing causal hypotheses and determines the earliest supported root cause. When the evidence is incomplete, it reports the first demonstrated failing boundary and the smallest decisive next test. It does not invent causes from noisy log messages.
+A reusable, evidence-first **end-to-end diagnostic** skill for Android bugreport ZIP/TXT archives. It reconstructs enterprise management and device state, follows an incident across processes and framework services, tests competing causal hypotheses and determines the earliest supported root cause. When the evidence is incomplete, it reports the first demonstrated failing boundary and the smallest decisive next test. It does not invent causes from noisy log messages. Triage signatures and playbooks are search aids: an unindexed symptom is investigated through its app, framework and vendor components using service dumps, process logs and properties.
 
 ## Structure
 
@@ -101,7 +101,7 @@ For direct command-line use, clone into any directory and set `SKILL_BASE` to it
 
 ## Development and privacy
 
-Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 116 automated parser and behavior tests. The four diagnosis scenarios have been run blind against the current fixtures and rubric once per case, with all four passing; a separate draft set of four larger synthetic cases passed three of four. Both runs were scored by their operator on one model, before the device overview was added; they are not independently audited or evidence of production accuracy, and the overview has not been model-evaluated. See [evaluation limits](evals/README.md).
+Run `python3 -m unittest discover -s tests -v` from the repository root. The suite has 117 automated parser and behavior tests. The four diagnosis scenarios have been run blind against the current fixtures and rubric once per case, with all four passing; a separate draft set of four larger synthetic cases passed three of four. Both runs were scored by their operator on one model, before the device overview was added; they are not independently audited or evidence of production accuracy, and the overview has not been model-evaluated. See [evaluation limits](evals/README.md).
 
 Keep real bugreports, customer data, generated analysis and credentials outside this repository. Test fixtures must be synthetic, using invented identifiers and example domains. When reporting a problem, provide a minimal synthetic reproduction; do not attach a real diagnostic archive. The ignore rules are only a convenience and do not replace reviewing what is committed.
 

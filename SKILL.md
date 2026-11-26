@@ -1,6 +1,6 @@
 ---
 name: android-enterprise-bugreport
-description: Analyse Android bugreport ZIPs, dumpstate, dumpsys, logcat and diagnostic reports. Diagnose AMAPI, Android Device Policy/CloudDPC, work profile/COPE, provisioning, install and kiosk failures, or provide a device management and health overview with optional offline HTML when asked to analyse a device without a symptom. Use supplied diagnostic evidence, not general Android development or policy/API questions without a report.
+description: Analyse Android bugreport ZIPs, dumpstate, dumpsys, logcat and diagnostic reports. Investigate managed-device failures across app, framework and vendor layers, including AMAPI, Android Device Policy/CloudDPC, work profile/COPE, provisioning, install and kiosk issues. Provide a management and health overview with optional offline HTML when no symptom is supplied. Use supplied diagnostic evidence, not general Android development or policy/API questions without a report.
 ---
 
 # Android bugreport diagnosis
@@ -22,7 +22,7 @@ Choose new output files outside the source directory; use `--member` to narrow a
 
 ## Workflow
 
-1. Identify the symptom, attempted operation, relevant app/user and incident time. If no symptom is supplied, report reconnaissance without inventing a failure. Ask only for information the evidence cannot supply.
+1. Start from the symptom: identify the attempted operation, app/user and incident time, then the app, framework service and vendor driver or process carrying that behaviour, where present. Locate their service dumps, logs by PID/tag and relevant properties. If no symptom is supplied, report reconnaissance without inventing a failure. Ask only for information the evidence cannot supply.
 2. Inventory captures, main reports, collector logs, traces, build, clock, retained buffers and gaps. Capture time is not incident time. Treat each capture separately; use `--member` to choose one, even when builds match. Recognize renamed duplicates by hash.
 3. Run the indexer when useful. Set `SKILL_BASE` to the absolute directory containing this SKILL.md; keep reports and outputs in the case workspace. Commands work from any working directory:
    ~~~sh
@@ -30,12 +30,13 @@ Choose new output files outside the source directory; use `--member` to narrow a
    python3 "$SKILL_BASE/scripts/triage.py" /absolute/case/report.zip --focus kiosk --package com.example.app --incident '2026-07-01T11:30:00Z' --utc
    ~~~
    `auto` searches all signatures without a category boost; it does not choose a diagnosis. Default incident times are device-local; `--utc` aligns using per-member clock evidence. Inspect unresolved clocks, daylight-saving ambiguity and inferred years before relying on the window.
+   Triage categories and playbooks accelerate searches; they do not define the skill's diagnostic scope. If there is no useful category or the hits do not explain the symptom, state that limitation and inspect the symptom's component path directly. An empty or unrelated result is not a clean bill of health.
 4. Reconstruct ownership, capabilities, users, package state and policy with [device-reconnaissance.md](references/device-reconnaissance.md). For a specific app:
    ~~~sh
    python3 "$SKILL_BASE/scripts/package_state.py" /absolute/case/report.zip com.example.app --uid 1012345
    ~~~
    Requested, applied and enforced state are distinct. Package presence does not establish ownership or certification; extracted package/user state is a snapshot.
-5. Follow [root-cause-analysis.md](references/root-cause-analysis.md) to locate the first divergence, test upstream prerequisites and reconcile contradictions. Select the relevant [playbook](references/playbooks.md); expand only when a demonstrated dependency requires it.
+5. Follow [root-cause-analysis.md](references/root-cause-analysis.md) to locate the first divergence, test upstream prerequisites and reconcile contradictions. Compare what the app requested, what the platform offered and what actually initialised and ran. Inspect startup and repeated errors along that path, including vendor components. Keep raw vendor errors; decode them only with matching version-specific documentation. Use a relevant [playbook](references/playbooks.md) when it helps; follow demonstrated dependencies even when no playbook covers them.
 6. Retrieve exact source/line context and inspect the annotations:
    ~~~sh
    python3 "$SKILL_BASE/scripts/context.py" /absolute/case/report.zip --pattern 'INSTALL_FAILED_' --context 12

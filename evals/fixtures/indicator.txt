@@ -1,0 +1,49 @@
+== dumpstate: 2026-05-14 15:08:00+0000
+------ SYSTEM PROPERTIES ------
+[ro.product.model]: [Example Panel]
+[ro.build.version.release]: [15]
+[ro.build.version.sdk]: [35]
+[persist.sys.timezone]: [Etc/UTC]
+[ro.vendor.indicator.backend]: [panel-led-v2]
+------ SYSTEM LOG ------
+--------- beginning of main
+05-14 14:59:00.010 2201 2201 I DeskClient: user=10 setIndicator channel=aux pattern=steady colour=green
+05-14 14:59:00.014 1100 1120 I IndicatorService: channel=aux pattern=steady output=armed
+05-14 15:03:00.012 2201 2201 I DeskClient: user=0 req=51 setIndicator channel=front pattern=pulse colour=blue periodMs=800
+05-14 15:03:00.016 1100 1120 I IndicatorService: callerUid=10221 user=0 channel=front pattern=pulse periodMs=800 ticket=313
+05-14 15:03:00.017 1100 1120 I IndicatorService: channel=front capabilityMatch=true backend=panel-led-v2
+05-14 15:03:00.021 875 875 E vendor.panel.indicator: channel=front initialise rc=-71
+05-14 15:03:00.022 1100 1120 E IndicatorService: ticket=313 channel=front backend not ready; output=not_armed
+05-14 15:03:00.024 2201 2201 W DeskClient: req=51 indicator request not applied
+05-14 15:03:00.100 1800 1800 I CatalogClient: refresh returned 204
+05-14 15:03:05.010 2201 2201 I DeskClient: user=0 req=52 setIndicator channel=front pattern=pulse colour=blue periodMs=800
+05-14 15:03:05.015 1100 1120 I IndicatorService: callerUid=10221 user=0 channel=front pattern=pulse periodMs=800 ticket=314
+05-14 15:03:05.016 1100 1120 I IndicatorService: channel=front capabilityMatch=true backend=panel-led-v2
+05-14 15:03:05.020 875 875 E vendor.panel.indicator: channel=front initialise rc=-71
+05-14 15:03:05.021 1100 1120 E IndicatorService: ticket=314 channel=front backend not ready; output=not_armed
+05-14 15:03:05.024 2201 2201 W DeskClient: req=52 indicator request not applied
+DUMP OF SERVICE device_policy:
+  Device Owner:
+    admin=ComponentInfo{com.example.admin/.Receiver}
+    User ID: 0
+DUMP OF SERVICE indicator:
+  backend=panel-led-v2
+  Capabilities:
+    channel=front patterns=[steady,pulse] colours=[blue,green] periodMsMin=200 periodMsMax=2000
+    channel=aux patterns=[steady] colours=[green]
+  Last request:
+    callerUid=10221 user=0 channel=front pattern=pulse colour=blue periodMs=800
+  Outputs:
+    channel=front initialised=false armed=false lastInitialiseRc=-71
+    channel=aux initialised=true armed=true pattern=steady colour=green
+DUMP OF SERVICE package:
+Packages:
+  Package [com.example.desk] (a1):
+    userId=10221
+    versionCode=12
+    User 0: installed=true hidden=false suspended=false stopped=false enabled=0
+------ PROCESSES ------
+USER PID NAME
+u0_a221 2201 com.example.desk
+system 1100 system_server
+system 875 vendor.panel.indicator

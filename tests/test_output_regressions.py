@@ -150,7 +150,8 @@ class OutputRegressions(unittest.TestCase):
             self.assertNotIn('rubric', copied_text.lower())
         self.assertIn('evals/README.md', (ROOT / 'SKILL.md').read_text())
         requests = json.loads((run / 'requests.json').read_text())
-        self.assertEqual(len(requests), 4)
+        self.assertEqual({r['id'] for r in requests},
+                         {r['id'] for r in json.loads((ROOT / 'evals/cases.json').read_text())})
         for request in requests:
             self.assertIn(str(copied / 'SKILL.md'), request['prompt'])
             self.assertNotIn(str(ROOT), request['prompt'])
@@ -168,6 +169,18 @@ class OutputRegressions(unittest.TestCase):
                                      '--out', str(destination)], capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
         self.assertFalse((ROOT / 'must-not-create-eval-run').exists())
+
+    def test_unindexed_eval_has_no_signatures_but_retains_manual_evidence(self):
+        fixture = ROOT / 'evals/fixtures/indicator.txt'
+        report = analyse(fixture, 'auto', [], None, 15)
+        self.assertTrue(report['coverage']['complete'])
+        self.assertFalse(report['findings'])
+        result = subprocess.run([sys.executable, '-I', str(ROOT / 'scripts/context.py'),
+                                 str(fixture), '--pattern', 'vendor.panel.indicator',
+                                 '--context', '2'], capture_output=True, text=True, check=True)
+        self.assertIn('initialise rc=-71', result.stdout)
+        self.assertIn('output=not_armed', result.stdout)
+        self.assertIn('kind=log', result.stdout)
 
     def test_display_omits_package_tags_for_logs_but_retains_dump_scope(self):
         path = self.report('DUMP OF SERVICE package:\n'

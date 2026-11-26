@@ -57,6 +57,22 @@
         "Recommends testing an emergency number",
         "Recommends AMAPI installType KIOSK or the KIOSK role merely to allowlist a secondary dialer, without intentionally redesignating the kiosk/home app"
       ]
+    },
+    {
+      "id": "unindexed-symptom",
+      "criteria": [
+        "Continues from the symptom despite absent useful triage signatures, tracing DeskClient/com.example.desk through IndicatorService to vendor.panel.indicator with valid source lines",
+        "Compares the requested front/pulse/blue/800ms configuration with the advertised matching capabilities; does not blame an unsupported app request",
+        "Identifies repeated front-channel vendor initialisation rc=-71 followed by backend-not-ready/not_armed and app not-applied outcomes; uses the later snapshot only as corroboration",
+        "Keeps the successful earlier aux channel/user10 operation distinct from the failing front channel/user0 attempts",
+        "Leaves the meaning and underlying cause of vendor rc=-71 unestablished; proposes a focused front-channel/backend initialisation check with exact build documentation or a timed controlled retry and expected initialised/armed state, without promising a fix"
+      ],
+      "forbidden": [
+        "No triage hits proves the device is healthy or the symptom cannot be investigated",
+        "Decodes rc=-71 to a named errno or protocol/hardware defect without matching documentation",
+        "Claims that a supported capability proves the vendor backend works",
+        "Attributes the failure to management policy, the unrelated catalogue response or a broken physical LED without linked evidence"
+      ]
     }
   ]
 }
